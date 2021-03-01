@@ -11,9 +11,11 @@ app.use(cors());
 app.use(express.json());
 
 app.route('/api/garden/areas')
-  .post((req, res) => {
-    console.log(req.body);
-    res.status(404).json({ response: 'hello' });
+  .get(async (req, res) => {
+    const knex = req.app.get('db');
+    const areas = await knex.select('*').from('garden_areas');
+    console.log(areas);
+    res.status(200).json(areas);
   });
 
 module.exports = app;
