@@ -3,6 +3,7 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const logger = require('morgan');
+const xss = require('xss');
 
 const app = express();
 
@@ -16,12 +17,21 @@ app.use((req, res, next) => setTimeout(() => {
   next();
 }, 1000));
 
+const serializeArea = (area) => ({
+  id: area.id,
+  name: xss(area.name),
+  length_cm: area.length_cm || '',
+  width_cm: area.width_cm || '',
+});
+
 app.route('/api/garden/areas')
   .get(async (req, res) => {
     const knex = req.app.get('db');
     const areas = await knex.select('*').from('garden_areas');
     // console.log(areas);
-    res.status(200).json(areas);
+    const parsedAreas = areas.map(serializeArea);
+    console.log(parsedAreas);
+    res.status(200).json(parsedAreas);
   })
   .post(async (req, res) => {
     const knex = req.app.get('db');
@@ -35,15 +45,27 @@ app.route('/api/garden/areas')
       .into('garden_areas')
       .returning('*');
     res
-      .status(201)
+      .status(200)
       .location(`${req.originalUrl}/${response.id}`)
       .json(response);
-  })
+  });
+
+app.route('/api/garden/areas/:areaId')
   .delete(async (req, res) => {
     const knex = req.app.get('db');
+    console.log(req.params.areaId);
     const [response] = await knex('garden_areas')
-      .where(req.body.id)
+      .where('id', req.params.areaId)
       .delete()
+      .returning('*');
+    console.log(response);
+    res.status(200).json(response);
+  })
+  .patch(async (req, res) => {
+    const knex = req.app.get('db');
+    const [response] = await knex('garden_areas')
+      .where('id', req.params.areaId)
+      .update(req.body)
       .returning('*');
     console.log(response);
     res.status(200).json(response);
