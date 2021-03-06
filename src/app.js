@@ -5,6 +5,10 @@ const express = require('express');
 const logger = require('morgan');
 const xss = require('xss');
 
+const fetch = require('node-fetch');
+
+const authRouter = require('./auth/auth-router');
+
 const app = express();
 
 app.use(logger('combined'));
@@ -16,6 +20,8 @@ app.use((req, res, next) => setTimeout(() => {
   console.log('Handling request');
   next();
 }, 1000));
+
+app.use('/auth', authRouter);
 
 const serializeArea = (area) => ({
   id: area.id,
@@ -119,8 +125,6 @@ app.route('/api/garden/plants/:plantId')
     console.log(response);
     res.status(200).json(response);
   });
-
-const fetch = require('node-fetch');
 
 app.route('/auth/trefle')
   .get(async (req, res) => {
