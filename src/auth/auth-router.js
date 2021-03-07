@@ -8,10 +8,9 @@ authRouter
     // Destructure request
     const { user_name, password } = req.body;
     // Check that values aren't missing
-    // Boolean will be false if any of the values are empty, null or undefined
     if (!(user_name && password)) {
       return res.status(400).json({
-        error: `Missing '${user_name ? 'user_name' : 'password'} on request body.`,
+        error: `Missing '${!user_name ? 'Username' : 'Password'}' on request body.`,
       });
     }
 
@@ -24,7 +23,7 @@ authRouter
       const validUser = await AuthService.getUserWithUserName(knex, user_name);
       // If not found return error
       if (!validUser) {
-        return res.status(400).json({
+        return res.status(401).json({
           error: 'Incorrect username or password',
         });
       }
@@ -33,7 +32,7 @@ authRouter
       const validPassword = await AuthService.comparePasswords(password, validUser.password);
       // If password not found return error
       if (!validPassword) {
-        return res.status(400).json({
+        return res.status(401).json({
           error: 'Incorrect username or password',
         });
       }

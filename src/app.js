@@ -8,6 +8,7 @@ const xss = require('xss');
 const fetch = require('node-fetch');
 
 const authRouter = require('./auth/auth-router');
+const usersRouter = require('./users/users-router');
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use((req, res, next) => setTimeout(() => {
   next();
 }, 1000));
 
-app.use('/auth', authRouter);
+app.use('/auth', usersRouter, authRouter);
 
 const serializeArea = (area) => ({
   id: area.id,
