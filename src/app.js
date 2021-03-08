@@ -10,6 +10,8 @@ const fetch = require('node-fetch');
 const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
 
+const notesRouter = require('./notes/notes-router');
+
 const app = express();
 
 app.use(logger('combined'));
@@ -23,6 +25,8 @@ app.use((req, res, next) => setTimeout(() => {
 }, 1000));
 
 app.use('/auth', usersRouter, authRouter);
+
+app.use('/api/users/:userId/garden/notes', notesRouter);
 
 const serializeArea = (area) => ({
   id: area.id,

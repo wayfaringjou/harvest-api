@@ -1,0 +1,7 @@
+ALTER TABLE garden_areas
+  DROP COLUMN IF EXISTS garden_id;
+
+ALTER TABLE plants
+  DROP COLUMN IF EXISTS garden_id;
+
+DROP TABLE IF EXISTS gardens;

@@ -1,0 +1,2 @@
+ALTER TABLE plants
+  DROP COLUMN IF EXISTS area_id
