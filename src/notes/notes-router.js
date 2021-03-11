@@ -7,8 +7,8 @@ const serializeNote = (note) => ({
   id: note.id,
   user_id: note.user_id,
   garden_id: note.garden_id,
-  area_id: note.area_id,
-  plant_id: note.plant_id,
+  area_id: note.area_id || null,
+  plant_id: note.plant_id || null,
   content: xss(note.content),
   title: xss(note.title),
 });
@@ -22,21 +22,29 @@ notesRouter
     console.log(parsedNotes);
     res.status(200).json(parsedNotes);
   })
-  .post(async (req, res) => {
+  .post(express.json(), async (req, res) => {
     const knex = req.app.get('db');
+    console.log(req.body);
     const {
       user_id, garden_id, area_id, plant_id, content, title,
     } = req.body;
     const newNote = serializeNote({
       user_id, garden_id, area_id, plant_id, content, title,
     });
-    const [response] = await knex.insert(newNote)
-      .into('notes')
-      .returning('*');
-    res
-      .status(200)
-      .location(`${req.originalUrl}/${response.id}`)
-      .json(response);
+
+    console.log(newNote);
+    try {
+      const [response] = await knex.insert(newNote)
+        .into('notes')
+        .returning('*');
+
+      res
+        .status(200)
+        .location(`${req.originalUrl}/${response.id}`)
+        .json(response);
+    } catch (error) {
+      console.log(error.message);
+    }
   });
 
 notesRouter

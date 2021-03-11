@@ -11,6 +11,7 @@ const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
 
 const notesRouter = require('./notes/notes-router');
+const gardensRouter = require('./gardens/gardens-router');
 
 const app = express();
 
@@ -26,7 +27,15 @@ app.use((req, res, next) => setTimeout(() => {
 
 app.use('/auth', usersRouter, authRouter);
 
-app.use('/api/users/:userId/garden/notes', notesRouter);
+app.use('/api/users/:userId/garden/notes', (req, res, next) => {
+  res.locals.user_id = req.params.userId;
+  next();
+}, notesRouter);
+
+app.use('/api/users/:userId/gardens', (req, res, next) => {
+  res.locals.user_id = req.params.userId;
+  next();
+}, gardensRouter);
 
 const serializeArea = (area) => ({
   id: area.id,
@@ -35,13 +44,15 @@ const serializeArea = (area) => ({
   width_cm: area.width_cm || '',
 });
 
-app.route('/api/garden/areas')
+app.route('/api/gardens/:gardenId/areas')
   .get(async (req, res) => {
     const knex = req.app.get('db');
-    const areas = await knex.select('*').from('garden_areas');
+    const areas = await knex.select('*').from('garden_areas')
+      .where('garden_id', req.params.gardenId);
+
     // console.log(areas);
     const parsedAreas = areas.map(serializeArea);
-    console.log(parsedAreas);
+    // console.log(parsedAreas);
     res.status(200).json(parsedAreas);
   })
   .post(async (req, res) => {
@@ -61,7 +72,14 @@ app.route('/api/garden/areas')
       .json(response);
   });
 
-app.route('/api/garden/areas/:areaId')
+app.route('/api/areas/:areaId')
+  .get(async (req, res) => {
+    const knex = req.app.get('db');
+    const [area] = await knex.select('*').from('garden_areas')
+      .where('id', req.params.areaId);
+    res.status(200)
+      .json(serializeArea(area));
+  })
   .delete(async (req, res) => {
     const knex = req.app.get('db');
     console.log(req.params.areaId);
@@ -85,16 +103,30 @@ app.route('/api/garden/areas/:areaId')
 const serializePlant = (plant) => ({
   id: plant.id,
   name: xss(plant.name),
+  garden_id: plant.garden_id,
+  area_id: plant.area_id,
 });
 
-app.route('/api/garden/plants')
+app.route('/api/gardens/:gardenId/plants')
   .get(async (req, res) => {
     const knex = req.app.get('db');
-    const plants = await knex.select('*').from('plants');
+    let plants;
+    console.log(req.query);
+    if (req.query.area_id) {
+      plants = await knex.select('*').from('plants')
+        .where('garden_id', req.params.gardenId)
+        .where('area_id', req.query.area_id);
+    } else {
+      plants = await knex.select('*').from('plants')
+        .where('garden_id', req.params.gardenId);
+    }
     const parsedPlants = plants.map(serializePlant);
-    console.log(parsedPlants);
+    // console.log(parsedPlants);
+    console.log('****');
     res.status(200).json(parsedPlants);
-  })
+  });
+
+app.route('/api/plants/')
   .post(async (req, res) => {
     const knex = req.app.get('db');
     const { name } = req.body;
@@ -110,7 +142,16 @@ app.route('/api/garden/plants')
       .json(response);
   });
 
-app.route('/api/garden/plants/:plantId')
+app.route('/api/plants/:plantId')
+  .get(async (req, res) => {
+    const knex = req.app.get('db');
+    console.log(req.params.plantId);
+    const [plant] = await knex.select('*').from('plants')
+      .where('id', req.params.plantId);
+    console.log(plant);
+    res.status(200)
+      .json(serializePlant(plant));
+  })
   .delete(async (req, res) => {
     const knex = req.app.get('db');
     console.log(req.params.plantId);
