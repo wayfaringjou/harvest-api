@@ -10,7 +10,7 @@ const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
 const notesRouter = require('./notes/notes-router');
 const gardensRouter = require('./gardens/gardens-router');
-const areasRouter = require('./garden_areas/garden_areas_router');
+const areasRouter = require('./garden-areas/garden-areas-router');
 const plantsRouter = require('./plants/plants-router');
 const trefleRouter = require('./auth/trefle-router');
 
@@ -53,7 +53,7 @@ app.use('/api/gardens/:gardenId/plants', (req, res, next) => {
   next();
 }, plantsRouter);
 
-app.use((error, req, res, next) => {
+app.use((error, _req, res, _next) => {
   let response;
   if (NODE_ENV === 'production') {
     response = { error: 'Server error' };

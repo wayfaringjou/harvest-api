@@ -17,5 +17,6 @@ module.exports = {
   },
   rules: {
     camelcase: 'off',
+    'no-unused-vars': 'off',
   },
 };

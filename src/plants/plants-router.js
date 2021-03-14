@@ -1,34 +1,27 @@
 const express = require('express');
-const xss = require('xss');
+const Plant = require('./plants-service');
 
 const plantsRouter = express.Router();
-
-const serializePlant = (plant) => ({
-  id: plant.id,
-  name: xss(plant.name),
-  garden_id: plant.garden_id,
-  area_id: plant.area_id,
-});
 
 plantsRouter
   .route('/')
   .get(async (req, res) => {
-    const knex = req.app.get('db');
     let plants;
-    console.log('We are here!!!!!!!');
-    console.log(req.query);
     if (req.query.area_id) {
-      plants = await knex.select('*').from('plants')
-        .where('garden_id', res.locals.garden_id)
-        .where('area_id', req.query.area_id);
+      plants = await Plant.getWithAreaQuery(
+        req.app.get('db'),
+        res.locals.garden_id,
+        req.query.area_id,
+      );
     } else {
-      plants = await knex.select('*').from('plants')
-        .where('garden_id', res.locals.garden_id);
+      plants = await Plant.getByRelation(
+        req.app.get('db'),
+        'garden_id',
+        res.locals.garden_id,
+      );
     }
-    const parsedPlants = plants.map(serializePlant);
-    // console.log(parsedPlants);
-    console.log('****');
-    res.status(200).json(parsedPlants);
+
+    res.status(200).json(plants.map(Plant.serialize));
   });
 
 plantsRouter
@@ -56,7 +49,7 @@ plantsRouter.route('/:plantId')
       .where('id', req.params.plantId);
     console.log(plant);
     res.status(200)
-      .json(serializePlant(plant));
+      .json(Plant.serialize(plant));
   })
   .delete(async (req, res) => {
     const knex = req.app.get('db');

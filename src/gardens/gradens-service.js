@@ -1,13 +1,12 @@
 const xss = require('xss');
+const commonMethods = require('../common/CommonMethods');
 
+const gardenCommonMethods = commonMethods('gardens');
 const Garden = {
+  ...gardenCommonMethods,
   getWithUserId: (db, user_id) => (
     db.select('*').from('gardens')
       .where('user_id', user_id)
-  ),
-  getById: (db, garden_id) => (
-    db.select('*').from('gardens')
-      .where('garden_id', garden_id)
   ),
   insert: async (db, newGarden) => {
     const [inserted] = await db.insert(newGarden)

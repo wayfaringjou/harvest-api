@@ -18,7 +18,7 @@ gardensRouter
       user_id, name,
     } = req.body;
 
-    const newGarden = Garden.serializeGarden({
+    const newGarden = Garden.serialize({
       user_id, name,
     });
 
@@ -34,19 +34,28 @@ gardensRouter
 
 gardensRouter
   .route('/:gardenId')
-  .get(async (req, res) => {
-    const knex = req.app.get('db');
-    const [garden] = await knex.select('*').from('gardens')
-      .where('id', req.params.gardenId);
-    res.status(200)
-      .json(Garden.serializeGarden(garden));
+  .get(async (req, res, next) => {
+    try {
+      const [garden] = await Garden.getById(
+        req.app.get('db'),
+        req.params.gardenId,
+      );
+
+      if (!garden) {
+        res.status(404).json('Garden with that id not found');
+      } else {
+        res.status(200)
+          .json(Garden.serialize(garden));
+      }
+    } catch (error) {
+      next(error);
+    }
   })
   .delete(async (req, res) => {
-    const knex = req.app.get('db');
-    const [response] = await knex('gardens')
-      .where('id', req.params.gardenId)
-      .delete()
-      .returning('*');
+    const [response] = await Garden.delete(
+      req.app.get('db'),
+      req.params.gardenId,
+    );
     res.status(200).json(response);
   })
   .patch(async (req, res) => {
