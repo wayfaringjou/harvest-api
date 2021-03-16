@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const Plant = require('./plants-service');
 
 const plantsRouter = express.Router();
@@ -27,47 +28,82 @@ plantsRouter
 plantsRouter
   .route('/')
   .post(async (req, res) => {
-    const knex = req.app.get('db');
-    const { name } = req.body;
-    const newPlant = {
+    const {
       name,
-    };
-    const [response] = await knex.insert(newPlant)
-      .into('plants')
-      .returning('*');
+      garden_id,
+      area_id,
+      image_url,
+      scientific_name,
+      sowing,
+      light,
+      days_to_harvest,
+      row_spacing,
+      spread,
+      fruit_months,
+      images,
+      treflePath,
+      gbifSpeciesKey,
+    } = req.body;
+
+    const newPlant = Plant.serialize({
+      name,
+      garden_id,
+      area_id: area_id || null,
+      image_url,
+      scientific_name,
+      sowing,
+      light: light || null,
+      days_to_harvest: days_to_harvest || null,
+      row_spacing: row_spacing || null,
+      spread: spread || null,
+      fruit_months,
+      images,
+      treflePath,
+      gbifspecieskey: gbifSpeciesKey || null,
+    });
+
+    const [response] = await Plant.insert(
+      req.app.get('db'),
+      newPlant,
+    );
+
     res
       .status(200)
-      .location(`${req.originalUrl}/${response.id}`)
+      .location(path.posix.join(req.originalUrl, `/${response.id}`))
       .json(response);
   });
 
 plantsRouter.route('/:plantId')
   .get(async (req, res) => {
-    const knex = req.app.get('db');
-    console.log(req.params.plantId);
-    const [plant] = await knex.select('*').from('plants')
-      .where('id', req.params.plantId);
-    console.log(plant);
-    res.status(200)
-      .json(Plant.serialize(plant));
+    const [plant] = await Plant.getById(
+      req.app.get('db'),
+      req.params.plantId,
+    );
+    if (!plant) {
+      res.status(404).json('Plant with that id not found');
+    } else {
+      res.status(200)
+        .json(Plant.serialize(plant));
+    }
   })
   .delete(async (req, res) => {
-    const knex = req.app.get('db');
-    console.log(req.params.plantId);
-    const [response] = await knex('plants')
-      .where('id', req.params.plantId)
-      .delete()
-      .returning('*');
-    console.log(response);
+    const [response] = await Plant.delete(
+      req.app.get('db'),
+      req.params.plantId,
+    );
     res.status(200).json(response);
   })
   .patch(async (req, res) => {
-    const knex = req.app.get('db');
-    const [response] = await knex('plants')
-      .where('id', req.params.plantId)
-      .update(req.body)
-      .returning('*');
-    console.log(response);
+    const updated = {};
+    const serialized = Plant.serialize(req.body);
+    // eslint-disable-next-line no-return-assign
+    Object.keys(req.body).forEach((key) => updated[key] = serialized[key]);
+
+    const [response] = await Plant.update(
+      req.app.get('db'),
+      req.params.plantId,
+      updated,
+    );
     res.status(200).json(response);
   });
 

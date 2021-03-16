@@ -31,7 +31,7 @@ app.use('/auth/trefle', trefleRouter);
 app.use('/api/areas', areasRouter);
 app.use('/api/plants', plantsRouter);
 
-// User-specific resources endpoints
+// User-specific resource endpoints
 app.use('/api/users/:userId/garden/notes', (req, res, next) => {
   res.locals.user_id = req.params.userId;
   next();
@@ -42,7 +42,7 @@ app.use('/api/users/:userId/gardens', (req, res, next) => {
   next();
 }, gardensRouter);
 
-// Garden-specific resources endpoints
+// Garden-specific resource endpoints
 app.use('/api/gardens/:gardenId/areas', (req, res, next) => {
   res.locals.garden_id = req.params.gardenId;
   next();
@@ -53,6 +53,7 @@ app.use('/api/gardens/:gardenId/plants', (req, res, next) => {
   next();
 }, plantsRouter);
 
+// Error handling
 app.use((error, _req, res, _next) => {
   let response;
   if (NODE_ENV === 'production') {

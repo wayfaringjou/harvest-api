@@ -6,6 +6,7 @@ const UsersService = require('./users-service');
 const usersRouter = express.Router();
 
 usersRouter
+  // eslint-disable-next-line consistent-return
   .post('/', express.json(), async (req, res, next) => {
     const { user_name, password } = req.body;
 

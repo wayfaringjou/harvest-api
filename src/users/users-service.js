@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const xss = require('xss');
 
+// eslint-disable-next-line no-useless-escape
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
 const UsersService = {
@@ -39,7 +40,7 @@ const UsersService = {
   },
   serializeUser: (user) => ({
     id: user.id,
-    user_name: user.user_name,
+    user_name: xss(user.user_name),
     date_created: new Date(user.date_created),
   }),
 };

@@ -59,11 +59,16 @@ gardensRouter
     res.status(200).json(response);
   })
   .patch(async (req, res) => {
-    const knex = req.app.get('db');
-    const [response] = await knex('gardens')
-      .where('id', req.params.gardenId)
-      .update(req.body)
-      .returning('*');
+    const updated = {};
+    const serialized = Garden.serialize(req.body);
+    // eslint-disable-next-line no-return-assign
+    Object.keys(req.body).forEach((key) => updated[key] = serialized[key]);
+
+    const [response] = await Garden.update(
+      req.app.get('db'),
+      req.params.gardenId,
+      updated,
+    );
     res.status(200).json(response);
   });
 
