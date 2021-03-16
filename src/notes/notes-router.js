@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
+const requireAuth = require('../../middleware/jwt-auth');
 const Note = require('./notes-service');
 
 const notesRouter = express.Router();
 
 notesRouter
   .route('/')
+  .all(requireAuth)
   .get(async (req, res) => {
     let notes;
 
@@ -19,7 +21,7 @@ notesRouter
       notes = await Note.getWithPlantQuery(
         req.app.get('db'),
         res.locals.user_id,
-        req.query.area_id,
+        req.query.plant_id,
       );
     } else if (req.query.garden_id) {
       notes = await Note.getWithGardenQuery(
@@ -62,6 +64,7 @@ notesRouter
 
 notesRouter
   .route('/:noteId')
+  .all(requireAuth)
   .get(async (req, res) => {
     const [note] = await Note.getById(
       req.app.get('db'),

@@ -13,7 +13,7 @@ const Note = {
   getWithPlantQuery: (db, user_id, plant_id) => (
     db.select('*').from('notes')
       .where('user_id', user_id)
-      .where('area_id', plant_id)
+      .where('plant_id', plant_id)
   ),
   getWithGardenQuery: (db, user_id, garden_id) => (
     db.select('*').from('notes')

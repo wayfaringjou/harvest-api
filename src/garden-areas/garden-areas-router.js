@@ -1,9 +1,11 @@
 const express = require('express');
+const requireAuth = require('../../middleware/jwt-auth');
 const Area = require('./garden-areas-service');
 
 const areasRouter = express.Router();
 
 areasRouter.route('/')
+  .all(requireAuth)
   .get(async (req, res) => {
     const areas = await Area.getByRelation(
       req.app.get('db'),
@@ -34,6 +36,7 @@ areasRouter.route('/')
   });
 
 areasRouter.route('/:areaId')
+  .all(requireAuth)
   .get(async (req, res) => {
     const [area] = await Area.getById(
       req.app.get('db'),

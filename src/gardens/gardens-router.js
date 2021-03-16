@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
+const requireAuth = require('../../middleware/jwt-auth');
 const Garden = require('./gradens-service');
 
 const gardensRouter = express.Router();
 
 gardensRouter
   .route('/')
+  .all(requireAuth)
   .get(async (req, res) => {
     const gardens = await Garden.getWithUserId(
       req.app.get('db'),
@@ -34,6 +36,7 @@ gardensRouter
 
 gardensRouter
   .route('/:gardenId')
+  .all(requireAuth)
   .get(async (req, res, next) => {
     try {
       const [garden] = await Garden.getById(

@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
+const requireAuth = require('../../middleware/jwt-auth');
 const Plant = require('./plants-service');
 
 const plantsRouter = express.Router();
 
 plantsRouter
   .route('/')
+  .all(requireAuth)
   .get(async (req, res) => {
     let plants;
     if (req.query.area_id) {
@@ -74,6 +76,7 @@ plantsRouter
   });
 
 plantsRouter.route('/:plantId')
+  .all(requireAuth)
   .get(async (req, res) => {
     const [plant] = await Plant.getById(
       req.app.get('db'),
