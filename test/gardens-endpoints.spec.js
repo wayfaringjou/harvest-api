@@ -1,4 +1,3 @@
-const { expect } = require('chai');
 const knex = require('knex');
 const request = require('supertest');
 const app = require('../src/app');
@@ -11,7 +10,7 @@ by the client on user creation
 
 describe('Garden endpoints', () => {
   let db;
-  
+
   before('Connect to db', () => {
     db = knex({
       client: 'pg',
@@ -20,9 +19,9 @@ describe('Garden endpoints', () => {
     app.set('db', db);
     console.log('Connected to db');
   });
-  
+
   after('disconnect from db', () => db.destroy());
-  
+
   // const res = await request(app).get('/api/gardens/1/areas')
   // expect(res.status).to.eql(200);
   // expect(res.body).to.eql([]);
@@ -30,9 +29,8 @@ describe('Garden endpoints', () => {
     context('Given no areas', () => {
       it('responds with 200 and an empty list', () => (
         request(app).get('/api/gardens/1/areas')
-        .expect(200, [])
-        ));
-      });
+          .expect(200, [])
+      ));
     });
   });
-  
+});

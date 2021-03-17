@@ -24,7 +24,7 @@ gardensRouter
       user_id, name,
     });
 
-    const response = await Garden.insert(
+    const [response] = await Garden.insert(
       req.app.get('db'),
       newGarden,
     );

@@ -2,6 +2,7 @@ const express = require('express');
 const xss = require('xss');
 const path = require('path');
 const UsersService = require('./users-service');
+const Garden = require('../gardens/gradens-service');
 
 const usersRouter = express.Router();
 
@@ -43,9 +44,21 @@ usersRouter
         password: hashedPassword,
       });
 
+      // Create a default garden for the new user
+      const newGarden = Garden.serialize({
+        user_id: newUser.id,
+        name: `${newUser.user_name}'s garden`,
+      });
+
+      const [newGardenResponse] = await Garden.insert(
+        req.app.get('db'),
+        newGarden,
+      );
+
+      console.log(newGardenResponse);
       return res.status(201)
         .location(path.posix.join(req.originalUrl, `/${newUser.id}`))
-        .json(UsersService.serializeUser(newUser));
+        .json({ ...UsersService.serializeUser(newUser), garden: { ...newGardenResponse } });
     } catch (error) {
       next(error);
     }
