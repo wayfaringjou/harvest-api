@@ -55,7 +55,6 @@ usersRouter
         newGarden,
       );
 
-      console.log(newGardenResponse);
       return res.status(201)
         .location(path.posix.join(req.originalUrl, `/${newUser.id}`))
         .json({ ...UsersService.serializeUser(newUser), garden: { ...newGardenResponse } });
