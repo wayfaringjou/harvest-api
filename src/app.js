@@ -59,7 +59,7 @@ app.use('/api/gardens/:gardenId/plants', (req, res, next) => {
 app.use((error, _req, res, _next) => {
   let response;
   if (NODE_ENV === 'production') {
-    response = { error: 'Server error' };
+    response = { error: error.message };
   } else {
     console.error(error);
     response = { error: error.message, object: error };
