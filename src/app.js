@@ -3,7 +3,7 @@ const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
-const { NODE_ENV } = require('../config');
+const { NODE_ENV, CLIENT_ORIGIN } = require('../config');
 
 // Routers
 const authRouter = require('./auth/auth-router');
@@ -19,7 +19,9 @@ const app = express();
 app.use(logger((NODE_ENV === 'production') ? 'tiny' : 'common', {
   skip: () => NODE_ENV === 'test',
 }));
-app.use(cors());
+app.use(cors({
+  origin: CLIENT_ORIGIN,
+}));
 app.use(helmet());
 
 app.use(express.json());
