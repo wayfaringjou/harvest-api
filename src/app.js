@@ -16,7 +16,7 @@ const trefleRouter = require('./auth/trefle-router');
 
 const app = express();
 
-app.use(logger((NODE_ENV === 'production') ? 'tiny' : 'common', {
+app.use(logger((NODE_ENV === 'production') ? 'common' : 'common', {
   skip: () => NODE_ENV === 'test',
 }));
 app.use(cors({
