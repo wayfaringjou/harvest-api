@@ -26,10 +26,10 @@ describe('Garden endpoints', () => {
   // expect(res.status).to.eql(200);
   // expect(res.body).to.eql([]);
   describe('GET /api/gardens/:gardenId/areas', () => {
-    context('Given no areas', () => {
-      it('responds with 200 and an empty list', () => (
+    context('Given no authentication', () => {
+      it('responds with 401', () => (
         request(app).get('/api/gardens/1/areas')
-          .expect(200, [])
+          .expect(401)
       ));
     });
   });
