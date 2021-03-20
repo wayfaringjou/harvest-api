@@ -1,6 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const { CLIENT_ORIGIN } = require('../../config');
+const { CLIENT_ORIGIN, TREFLE_TOKEN } = require('../../config');
 
 const trefleRouter = express.Router();
 
@@ -11,7 +11,7 @@ trefleRouter.route('/')
       origin: CLIENT_ORIGIN,
       // origin: 'http://localhost:3000',
       // ip: 'THE-WEBSITE-USER-IP',
-      token: 'rpSbG-As7QHC5sqn1E3-x-p7FjDXW82T250KmCGl3EE',
+      token: TREFLE_TOKEN,
     };
     const response = await fetch(
       'https://trefle.io/api/auth/claim', {
