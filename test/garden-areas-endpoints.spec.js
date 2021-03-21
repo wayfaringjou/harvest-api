@@ -3,14 +3,7 @@ const request = require('supertest');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-/*
-- Gardens should be accesible only by their user's id to a signed in user.
-
-- For now each user will have one garden, so posting a garden will be done
-by the client on user creation
-*/
-
-describe('Garden endpoints', () => {
+describe('Garden areas endpoints', () => {
   let db;
 
   const {
@@ -32,10 +25,7 @@ describe('Garden endpoints', () => {
   after('disconnect from db', () => db.destroy());
 
   afterEach('cleanup', () => helpers.cleanTables(db));
-  // const res = await request(app).get('/api/gardens/1/areas')
-  // expect(res.status).to.eql(200);
-  // expect(res.body).to.eql([]);
-  describe('GET /api/users/:userId/gardens', () => {
+  describe('GET /api/gardens/:gardenId/areas', () => {
     beforeEach('insert data', () => (
       helpers.seedTables(
         db,
@@ -46,21 +36,24 @@ describe('Garden endpoints', () => {
         testNotes,
       )
     ));
-
     context('Given no authentication', () => {
       it('responds with 401', () => (
-        request(app).get(`/api/users/${testUsers[0].id}/gardens`)
+        request(app).get(`/api/gardens/${testGarden[0].id}/areas`)
           .expect(401)
       ));
     });
-    context('Authenticated user request their garden', () => {
-      it('responds with 200 and garden data', () => (
+    context('Authenticated user request their garden areas', () => {
+      it('responds with 200 and areas data', () => (
         request(app)
-          .get(`/api/users/${testUsers[0].id}/gardens`)
+          .get(`/api/gardens/${testGarden[0].id}/areas`)
           .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .expect(200)
           .expect((res) => {
-            expect(res.body).to.eql(testGarden);
+            res.body.forEach((area, i) => {
+              expect(area.user_name).to.eql(testAreas[i].user_name);
+              expect(area.length_cm).to.eql(testAreas[i].length_cm || '');
+              expect(area.width_cm).to.eql(testAreas[i].width_cm || '');
+            });
           })
       ));
     });

@@ -3,14 +3,7 @@ const request = require('supertest');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-/*
-- Gardens should be accesible only by their user's id to a signed in user.
-
-- For now each user will have one garden, so posting a garden will be done
-by the client on user creation
-*/
-
-describe('Garden endpoints', () => {
+describe('Garden notes endpoints', () => {
   let db;
 
   const {
@@ -32,10 +25,7 @@ describe('Garden endpoints', () => {
   after('disconnect from db', () => db.destroy());
 
   afterEach('cleanup', () => helpers.cleanTables(db));
-  // const res = await request(app).get('/api/gardens/1/areas')
-  // expect(res.status).to.eql(200);
-  // expect(res.body).to.eql([]);
-  describe('GET /api/users/:userId/gardens', () => {
+  describe('GET /api/users/:userId/garden/notes', () => {
     beforeEach('insert data', () => (
       helpers.seedTables(
         db,
@@ -46,21 +36,28 @@ describe('Garden endpoints', () => {
         testNotes,
       )
     ));
-
     context('Given no authentication', () => {
       it('responds with 401', () => (
-        request(app).get(`/api/users/${testUsers[0].id}/gardens`)
+        request(app).get(`/api/users/${testUsers[0].id}/garden/notes`)
           .expect(401)
       ));
     });
-    context('Authenticated user request their garden', () => {
-      it('responds with 200 and garden data', () => (
+    context('Authenticated user request their notes', () => {
+      it('responds with 200 and notes data', () => (
         request(app)
-          .get(`/api/users/${testUsers[0].id}/gardens`)
+          .get(`/api/users/${testUsers[0].id}/garden/notes`)
           .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .expect(200)
           .expect((res) => {
-            expect(res.body).to.eql(testGarden);
+            res.body.forEach((note, i) => {
+              expect(note.user_id).to.eql(testNotes[i].user_id);
+              expect(note.garden_id).to.eql(testNotes[i].garden_id);
+              expect(note.plant_id).to.eql(testNotes[i].plant_id || '');
+              expect(note.area_id).to.eql(testNotes[i].area_id || '');
+              expect(note.area_id).to.eql(testNotes[i].area_id || '');
+              expect(note.title).to.eql(testNotes[i].title);
+              expect(note.content).to.eql(testNotes[i].content);
+            });
           })
       ));
     });
