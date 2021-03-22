@@ -214,3 +214,26 @@ The token is provided by the api when a user logs in.
 
   - Response:
     - Single plant object for the given id.
+
+## Client screenshots
+- Landing page
+
+![Landing](./screens/landing.jpg) 
+
+- Garden areas section
+
+![Areas](./screens/areas.jpg) 
+
+- Plants section
+
+![Plants](./screens/plants.jpg) 
+
+- Plant detail
+
+![Plant detail](./screens/plant-details.jpg) 
+
+## Client Summary
+The client-side application combines our API with an external API to help the user gather data about their plants and shows images that can help identify plant species. It also allows the user to manage notes and areas.
+
+## Client Built with
+This project was made with React, Javascript and CSS.
