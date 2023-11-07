@@ -22,7 +22,7 @@ This project was made with Express, Knex and Postgresql.
 
 ## Client side repo:
 
-[Harvest-api](https://github.com/wayfaringjou/harvest)
+[Harvest-client](https://github.com/wayfaringjou/harvest)
 
 ## API documentation
 
